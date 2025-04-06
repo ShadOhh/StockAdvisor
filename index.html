@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Stock Broker Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6 font-sans">
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-2xl p-6">
+    <h1 class="text-3xl font-bold mb-4 text-center">📈 AI Stock Broker</h1>
+
+    <div class="flex justify-center mb-6">
+      <button id="runBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        ▶️ Run AI Stock Broker
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div class="p-4 border rounded shadow">
+        <p class="font-semibold">Portfolio Agent:</p>
+        <p id="portfolioStatus" class="text-sm text-gray-600">Idle</p>
+      </div>
+      <div class="p-4 border rounded shadow">
+        <p class="font-semibold">Stock Researcher:</p>
+        <p id="researchStatus" class="text-sm text-gray-600">Idle</p>
+      </div>
+      <div class="p-4 border rounded shadow">
+        <p class="font-semibold">Sentiment Agent:</p>
+        <p id="sentimentStatus" class="text-sm text-gray-600">Idle</p>
+      </div>
+      <div class="p-4 border rounded shadow">
+        <p class="font-semibold">Decision Agent:</p>
+        <p id="decisionStatus" class="text-sm text-gray-600">Idle</p>
+      </div>
+    </div>
+
+    <div class="mb-2 font-semibold">Log Output:</div>
+    <pre id="logOutput" class="bg-black text-green-400 text-sm p-4 rounded h-64 overflow-y-scroll whitespace-pre-wrap"></pre>
+  </div>
+
+  <script>
+    const runBtn = document.getElementById('runBtn');
+    const logOutput = document.getElementById('logOutput');
+    const portfolioStatus = document.getElementById('portfolioStatus');
+    const researchStatus = document.getElementById('researchStatus');
+    const sentimentStatus = document.getElementById('sentimentStatus');
+    const decisionStatus = document.getElementById('decisionStatus');
+    
+    const statusMap = {
+      portfolio: portfolioStatus,
+      research: researchStatus,
+      sentiment: sentimentStatus,
+      decision: decisionStatus
+    };
+  
+    const getStatusIndicator = (status) => {
+      switch (status) {
+        case "Initializing...":
+          return "🔵 Initializing...";
+        case "Running...":
+          return "🟡 Running...";
+        case "Finished":
+          return "🟢 Finished";
+        default:
+          return "⚪ Idle";
+      }
+    };
+  
+    const pollStatus = async () => {
+      const res = await fetch("/status");
+      const data = await res.json();
+      let allFinished = true;
+      for (const [agent, status] of Object.entries(data)) {
+        if (statusMap[agent]) {
+          statusMap[agent].textContent = getStatusIndicator(status);
+        }
+        if (status !== "Finished") {
+          allFinished = false;
+        }
+      }
+      return allFinished;
+    };
+  
+    runBtn.addEventListener('click', () => {
+      
+      logOutput.textContent = '';
+      Object.values(statusMap).forEach(elem => {
+        elem.textContent = getStatusIndicator("Idle");
+      });
+    
+    
+      const pollInterval = setInterval(async () => {
+        const done = await pollStatus();
+        if (done) clearInterval(pollInterval);
+      }, 1000);
+    
+      
+      fetch("/run")
+        .then(response => response.text())
+        .then(text => {
+           logOutput.textContent = text;
+        });
+    });
+  </script>
+  
+  
+</body>
+</html>

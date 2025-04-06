@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.env
+.env
+.env.*
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# FastAPI logs or cache
+*.log
+*.sqlite3
+*.db
+*.pid
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+coverage.xml
+
+# Unit test / pytest
+.pytest_cache/
+
+# Frontend assets
+node_modules/
+dist/
+build/
+staticfiles/
+
+# Uvicorn reload cache
+.reload/
+
+# MyPy / Pylint / Linting
+.mypy_cache/
+.dmypy.json
+.pyre/
